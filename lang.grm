@@ -1,0 +1,87 @@
+(* Sample interactive calculator for ML-Yacc *)
+
+(*fun lookup "bogus" = 10000
+  | lookup s = 0
+*)
+(* VARDECL for "var"  *)
+%%
+
+%eop EOF 
+
+(* %pos declares the type of positions for terminals.
+   Each symbol has an associated left and right position. *)
+
+%pos int
+
+%left SUB PLUS
+%left TIMES DIV
+%right CARAT (**)
+
+%term  RATIONAL of Rational.rational 
+        | RATDECL
+        | BOOLDECL
+        | BOOL of bool
+        | VARDECL 
+        | IF 
+        | THEN
+        | ELSE
+        | FI
+        | WHILE
+        | DO
+        | ODPROC
+        | PRINT 
+        | READ
+        | CALL
+        | RATPLU
+        | RATNEGAT
+        | RATINV
+        | RATPLUS 
+        | RATTIMES 
+        | RATMINUS
+        | RATDIV
+        | RATMAKE
+        | RATRAT
+        | RATSHOW
+        | RATSHOWDEC
+        | FROMDEC
+        | TODEC
+        | NOTBOOL
+        | ORBOOL
+        | ANDBOOL
+        | COMMA
+        | SEMI 
+        | EOF 
+        | CARAT 
+        | DIV 
+        | SUB 
+        | LPAREN 
+        | RPAREN
+%nonterm EXP of Rational.rational | START of Rational.rational option
+
+%name Lang
+
+(*%subst PRINT for ID *)
+%prefer PLUS TIMES DIV SUB
+%keyword PRINT SEMI
+
+%noshift EOF
+%verbose
+%%
+
+(* the parser returns the value associated with the expression *)
+
+  START : PRINT EXP (print (Rational.showRat EXP);
+                     print "\n";
+                     SOME EXP)
+        | EXP (SOME EXP)
+        | (NONE)
+  EXP : NUM             (NUM)
+      | EXP PLUS EXP    (Rational.add(EXP1,EXP2))
+      | EXP TIMES EXP   (Rational.multiply(EXP1,EXP2))
+      | EXP DIV EXP     (valOf(Rational.divide(EXP1,EXP2)))
+      | EXP SUB EXP     (Rational.subtract(EXP1,EXP2))
+      | EXP CARAT EXP   (let fun e (m,((false,[0]),(false,[1]))) = ((false,[1]),(false,[1]))
+                                | e (m,l) = Rational.multiply(m,e(m,Rational.subtract(l,((false,[1]),(false,[1])))))
+                         in e (EXP1,EXP2)
+                         end)
+      | LPAREN EXP RPAREN ((EXP1))
