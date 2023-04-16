@@ -6,12 +6,11 @@
 (* VARDECL for "var"  *)
 %%
 
-%eop EOF 
 
 (* %pos declares the type of positions for terminals.
    Each symbol has an associated left and right position. *)
 
-%pos int
+
 
 %left SUB PLUS
 %left TIMES DIV
@@ -28,6 +27,7 @@
         | FI
         | WHILE
         | DO
+        | PROC
         | ODPROC
         | PRINT 
         | READ
@@ -48,21 +48,36 @@
         | NOTBOOL
         | ORBOOL
         | ANDBOOL
+        | RELMORE
+        | RELLESSQ
+        | RELMOREQ
+        | RELLESS
+        | RELNE
+        | RELEQ
+        | ASSIGN
         | COMMA
         | SEMI 
-        | EOF 
-        | CARAT 
-        | DIV 
-        | SUB 
         | LPAREN 
         | RPAREN
-%nonterm EXP of Rational.rational | START of Rational.rational option
+        | LCURL
+        | RCURL
+        | ID of string
+        | COMMENT of string
+        | EOF
+%nonterm START of LOGIC.environment
+        | COMMANDSEQ of LOGIC.environment
+        | COMMAND of LOGIC.environment
+        | ASSIGNCMD of LOGIC.environment
+        | IDENT of string
+        | EXP of LOGIC.value
+        | RATEXP of Rational.rational
+        | BOOLEXP of bool
 
 %name Lang
-
+%pos int
 (*%subst PRINT for ID *)
-%prefer PLUS TIMES DIV SUB
 %keyword PRINT SEMI
+%eop EOF 
 
 %noshift EOF
 %verbose
